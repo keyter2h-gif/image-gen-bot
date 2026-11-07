@@ -9,13 +9,16 @@ import requests
 
 app = FastAPI()
 
+# Configuration: Add your custom prompt list and variation limits here
 PROMPT_LIST = [
-    "A futuristic neon cyberpunk city street at night, highly detailed, 4k",
-    "A serene Japanese zen garden with cherry blossoms falling, peaceful atmosphere"
+    "A detailed macro shot of a cyberpunk mechanical gear mechanism, 8k",
+    "A futuristic cyberpunk street market at night with neon signs, highly detailed",
+    "A close-up portrait of a cybernetic android with glowing blue optical circuits"
 ]
 VARIATIONS_PER_PROMPT = 1
 MODEL_NAME = "dall-e-3"
 
+# Local folder storage on Render server
 OUTPUT_DIR = Path.cwd() / "bot_images"
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
@@ -23,7 +26,7 @@ def run_image_bot():
     client = OpenAI()
     print("Starting multi-prompt bot batch...")
     
-    # Automatically count existing images so numbering continues correctly
+    # Automatically count existing images so sequential numbering continues correctly
     existing_files = list(OUTPUT_DIR.glob("*.png"))
     file_counter = len(existing_files) + 1
     
@@ -58,7 +61,7 @@ def run_image_bot():
 @app.post("/generate")
 def trigger_generation(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_image_bot)
-    return {"status": "Generation started!"}
+    return {"status": "Multi-prompt generation started in the background!"}
 
 @app.get("/download-latest")
 def download_latest():
