@@ -74,6 +74,15 @@ def trigger_generation(background_tasks: BackgroundTasks):
     # Runs the generation sequence safely in the background to prevent HTTP timeouts
     background_tasks.add_task(run_image_bot)
     return {"status": "Multi-prompt generation started in the background!"}
+    @app.get("/download-latest")
+def download_latest():
+    files = list(OUTPUT_DIR.glob("*.png"))
+    if not files:
+        raise HTTPException(status_code=404, detail="No images found yet.")
+    
+    # Sort by creation time to get the newest file
+    latest_file = max(files, key=os.path.getctime)
+    return FileResponse(path=latest_file, filename=latest_file.name, media_type='image/png')
 
 @app.get("/")
 def health_check():
